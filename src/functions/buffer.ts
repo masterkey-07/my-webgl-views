@@ -13,7 +13,7 @@ export const createProgramAttributeBuffer = (
   gl: GL,
   program: WebGLProgram,
   attribute: WebGLAttribute
-) => {
+): WebGLBuffer => {
   const buffer = gl.createBuffer();
 
   const location = gl.getAttribLocation(program, attribute.name);
@@ -30,7 +30,7 @@ export const createProgramAttributeBuffer = (
     attribute.offset || 0
   );
 
-  return buffer;
+  return buffer as WebGLBuffer;
 };
 
 export const bindBufferFloatArray = (
