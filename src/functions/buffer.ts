@@ -1,0 +1,57 @@
+import { GL } from "./webgl";
+
+export type WebGLAttribute = {
+  name: string;
+  size: number;
+  type?: GLenum;
+  normalized?: GLboolean;
+  stride?: GLsizei;
+  offset?: GLintptr;
+};
+
+export const createProgramAttributeBuffer = (
+  gl: GL,
+  program: WebGLProgram,
+  attribute: WebGLAttribute
+) => {
+  const buffer = gl.createBuffer();
+
+  const location = gl.getAttribLocation(program, attribute.name);
+
+  gl.enableVertexAttribArray(location);
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+
+  gl.vertexAttribPointer(
+    location,
+    attribute.size,
+    attribute.type || gl.FLOAT,
+    attribute.normalized || false,
+    attribute.stride || 0,
+    attribute.offset || 0
+  );
+
+  return buffer;
+};
+
+export const bindBufferFloatArray = (
+  gl: GL,
+  buffer: WebGLBuffer,
+  array: Float32Array,
+  usage: GLenum = gl.STATIC_DRAW
+) => {
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, array, usage);
+};
+
+export const drawFloatArrayBuffers = (
+  gl: GL,
+  positionBuffer: WebGLBuffer,
+  colorBuffer: WebGLBuffer,
+  data: { vertices: Float32Array; colors: Float32Array },
+  draw: { mode?: GLenum; first?: number; count: number }
+) => {
+  bindBufferFloatArray(gl, positionBuffer, data.vertices);
+  bindBufferFloatArray(gl, colorBuffer, data.colors);
+
+  gl.drawArrays(draw.mode || gl.TRIANGLES, draw.first || 0, draw.count);
+};
