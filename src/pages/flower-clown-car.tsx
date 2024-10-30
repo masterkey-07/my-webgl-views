@@ -80,6 +80,7 @@ export const FlowerClownCar = () => {
 
         drawCar(gl, positionBuffer, colorBuffer);
         drawClown(gl, positionBuffer, colorBuffer);
+        drawFlower(gl, positionBuffer, colorBuffer);
       }}
     />
   );
@@ -211,4 +212,46 @@ const drawClown = (gl: GL, position: WebGLBuffer, color: WebGLBuffer) => {
   );
 };
 
-// const drawFlower = (gl: GL, position: WebGLBuffer, color: WebGLBuffer) => {};
+const drawFlower = (gl: GL, position: WebGLBuffer, color: WebGLBuffer) => {
+  // Definindo o caule da flor
+  drawSimpleRectangle(
+    gl,
+    position,
+    color,
+    {
+      startPoint: glPos([200, 425]) as Vector2, // Posição do caule
+      width: glSize(10) as number,
+      height: glSize(50) as number,
+    },
+    [0, 1, 0] // Cor verde para o caule
+  );
+
+  // Definindo as pétalas
+  const petalColor: Vector3 = [1, 0.5, 0]; // Cor laranja para as pétalas
+  const petalPositions: Vector2[] = [
+    glPos([400 - 195, 355 + 135]) as Vector2, // Pétala superior
+    glPos([380 - 195, 340 + 135]) as Vector2, // Pétala esquerda
+    glPos([420 - 195, 340 + 135]) as Vector2, // Pétala direita
+    glPos([385 - 195, 321 + 135]) as Vector2, // Pétala inferior esquerda
+    glPos([415 - 195, 321 + 135]) as Vector2, // Pétala inferior direita
+  ];
+
+  petalPositions.forEach((center) => {
+    drawSimpleCircle(
+      gl,
+      position,
+      color,
+      { radius: 0.03, triangles: 30, center },
+      petalColor
+    );
+  });
+
+  // Definindo o miolo da flor
+  drawSimpleCircle(
+    gl,
+    position,
+    color,
+    { radius: 0.04, triangles: 30, center: glPos([205, 470]) as Vector2 },
+    [1, 1, 0] // Cor amarela para o miolo
+  );
+};
