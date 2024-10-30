@@ -211,5 +211,4 @@ const drawClown = (gl: GL, position: WebGLBuffer, color: WebGLBuffer) => {
   );
 };
 
-
-const drawFlower = (gl:GL)
+// const drawFlower = (gl: GL, position: WebGLBuffer, color: WebGLBuffer) => {};
