@@ -1,17 +1,17 @@
-import { GL } from "./webgl";
-import { Point, Vector3, isVector3 } from "./types";
-import { drawFloatArrayBuffers } from "./buffer";
-import { fillColor } from "./color";
+import { GL } from "../core/webgl";
+import { Vector2, Vector3, isVector3 } from "../core/types";
+import { drawFloatArrayBuffers } from "../core/buffer";
+import { fillColor } from "../core/color";
 
 const RECTANGLE_NUMBER_OF_POINTS = 6;
 
 export type Triangle = {
-  pointA: Point;
-  pointB: Point;
-  pointC: Point;
+  pointA: Vector2;
+  pointB: Vector2;
+  pointC: Vector2;
 };
 
-const getRectangleVertices = (rectangle: Triangle) => {
+export const getRectangleVertices = (rectangle: Triangle) => {
   const { pointA, pointB, pointC } = rectangle;
 
   return new Float32Array([...pointA, ...pointB, ...pointC]);

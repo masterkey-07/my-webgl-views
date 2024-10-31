@@ -1,17 +1,17 @@
-import { GL } from "./webgl";
-import { Point, Vector3, isVector3 } from "./types";
-import { drawFloatArrayBuffers } from "./buffer";
-import { fillColor } from "./color";
+import { GL } from "../core/webgl";
+import { Vector2, Vector3, isVector3 } from "../core/types";
+import { drawFloatArrayBuffers } from "../core/buffer";
+import { fillColor } from "../core/color";
 
 const RECTANGLE_NUMBER_OF_POINTS = 6;
 
 export type Rectangle = {
-  startPoint: Point;
+  startPoint: Vector2;
   width: number;
   height: number;
 };
 
-const getRectangleVertices = (rectangle: Rectangle) => {
+export const getRectangleVertices = (rectangle: Rectangle) => {
   const { startPoint, height, width } = rectangle;
 
   const [x, y] = startPoint;

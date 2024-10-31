@@ -1,5 +1,5 @@
 import React, { createRef } from "react";
-import { GL } from "../functions/webgl";
+import { GL } from "../webgl/core/webgl";
 
 type WebGLCanvasProps = React.DetailedHTMLProps<
   React.CanvasHTMLAttributes<HTMLCanvasElement>,

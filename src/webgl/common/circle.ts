@@ -1,7 +1,7 @@
-import { drawFloatArrayBuffers } from "./buffer";
-import { fillColor, randomColor } from "./color";
-import { isVector3, Vector2, Vector3 } from "./types";
-import { GL } from "./webgl";
+import { GL } from "../core/webgl";
+import { drawFloatArrayBuffers } from "../core/buffer";
+import { fillColor, randomColor } from "../core/color";
+import { isVector3, Vector2, Vector3 } from "../core/types";
 
 const TWO_PI = 2 * Math.PI;
 
@@ -21,18 +21,17 @@ export const getCircleVertices = (
   for (let degree = 0; degree < triangles; degree++) {
     vertexData.push(...center);
 
+    const [x, y] = center;
+
     const first = (degree * TWO_PI) / triangles;
 
-    vertexData.push(
-      center[0] + radius * Math.cos(first),
-      center[1] + radius * Math.sin(first)
-    );
+    vertexData.push(x + radius * Math.cos(first), y + radius * Math.sin(first));
 
     const second = ((degree + 1) * TWO_PI) / triangles;
 
     vertexData.push(
-      center[0] + radius * Math.cos(second),
-      center[1] + radius * Math.sin(second)
+      x + radius * Math.cos(second),
+      y + radius * Math.sin(second)
     );
   }
 

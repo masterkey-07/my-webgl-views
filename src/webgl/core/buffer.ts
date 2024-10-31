@@ -1,4 +1,4 @@
-import { GL } from "./webgl";
+import { GL, toColor, toPos } from "./webgl";
 
 export type WebGLAttribute = {
   name: string;
@@ -50,8 +50,8 @@ export const drawFloatArrayBuffers = (
   data: { vertices: Float32Array; colors: Float32Array },
   draw: { mode?: GLenum; first?: number; count: number }
 ) => {
-  bindBufferFloatArray(gl, positionBuffer, data.vertices);
-  bindBufferFloatArray(gl, colorBuffer, data.colors);
+  bindBufferFloatArray(gl, colorBuffer, data.colors.map(toColor));
+  bindBufferFloatArray(gl, positionBuffer, data.vertices.map(toPos));
 
   gl.drawArrays(draw.mode || gl.TRIANGLES, draw.first || 0, draw.count);
 };
