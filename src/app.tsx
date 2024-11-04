@@ -48,12 +48,12 @@ const App = () => {
         <h2 style={headerStyle}>Exemplos</h2>
         <ul style={listStyle}>
           {routers.map(({ path }) => (
-            <li style={listItemStyle}>
+            <li key={path} style={listItemStyle}>
               <Link style={linkStyle} to={path!}>
                 {path?.replace("/", "")}
               </Link>
             </li>
-          ))}{" "}
+          ))}
         </ul>
       </nav>
       <main style={contentStyle}>

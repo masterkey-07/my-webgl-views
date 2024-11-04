@@ -46,12 +46,14 @@ export const bindBufferFloatArray = (
 export const drawFloatArrayBuffers = (
   gl: GL,
   positionBuffer: WebGLBuffer,
-  colorBuffer: WebGLBuffer,
-  data: { vertices: Float32Array; colors: Float32Array },
+  colorBuffer: WebGLBuffer | undefined,
+  data: { vertices: Float32Array; colors: Float32Array | undefined },
   draw: { mode?: GLenum; first?: number; count: number }
 ) => {
-  bindBufferFloatArray(gl, colorBuffer, data.colors.map(toColor));
+  if (colorBuffer && data.colors)
+    bindBufferFloatArray(gl, colorBuffer, data.colors.map(toColor));
+
   bindBufferFloatArray(gl, positionBuffer, data.vertices.map(toPos));
 
-  gl.drawArrays(draw.mode || gl.TRIANGLES, draw.first || 0, draw.count);
+  gl.drawArrays(draw.mode ?? gl.TRIANGLES, draw.first ?? 0, draw.count);
 };

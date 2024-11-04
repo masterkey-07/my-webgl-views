@@ -31,9 +31,9 @@ export const setWebGLBackgroundColor = (gl: GL, color: Vector4) => {
   gl.clear(gl.COLOR_BUFFER_BIT);
 };
 
-const relative = (value: number) => value / (conf.size / 2);
-const relative2 = (value: number) => relative(value) - 1;
-
-export const toPos = (value: number) => relative2(value as number);
+export const toPos = (value: number) =>
+  conf.size ? value / (conf.size / 2) - 1 : value;
 
 export const toColor = (value: number) => value / 255;
+
+// a = 2x / (x + 1)

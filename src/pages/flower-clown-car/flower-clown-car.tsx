@@ -4,9 +4,15 @@ import { drawFlower } from "./draw-flower";
 import { Vector3 } from "../../webgl/core/types";
 import { compileShader } from "../../webgl/core/shader";
 import { createProgram } from "../../webgl/core/program";
-import { WebGLCanvas } from "../../components/WebGLCanvas";
+import { BorderedCanvas } from "../../components/bordered-canvas";
 import { createProgramAttributeBuffer } from "../../webgl/core/buffer";
-import { setWebGLConf, setWebGLBackgroundColor } from "../../webgl/core/webgl";
+import {
+  setWebGLConf,
+  setWebGLBackgroundColor,
+  GL,
+} from "../../webgl/core/webgl";
+import { useGL } from "../../hooks/use-gl";
+import React from "react";
 
 const WHITE: Vector3 = [1, 1, 1];
 
@@ -32,47 +38,51 @@ const FRAGMENT_SHADER_SOURCE = `
 `;
 
 export const FlowerClownCar = () => {
-  return (
-    <WebGLCanvas
-      width={600}
-      height={600}
-      setup={(gl) => {
-        setWebGLConf({ size: 600 });
+  const ref = React.useRef<HTMLCanvasElement>(null);
 
-        const vertexShader = compileShader(
-          gl,
-          gl.VERTEX_SHADER,
-          VERTEX_SHADER_SOURCE
-        );
+  const gl = useGL(ref);
 
-        const fragmentShader = compileShader(
-          gl,
-          gl.FRAGMENT_SHADER,
-          FRAGMENT_SHADER_SOURCE
-        );
+  React.useLayoutEffect(() => {
+    if (gl) draw(gl);
+  }, [gl]);
 
-        const program = createProgram(gl, vertexShader, fragmentShader);
+  return <BorderedCanvas ref={ref} width={600} height={600} />;
+};
 
-        gl.useProgram(program);
+const draw = (gl: GL) => {
+  setWebGLConf({ size: 600 });
 
-        const positionBuffer = createProgramAttributeBuffer(gl, program, {
-          name: "position",
-          type: gl.FLOAT,
-          size: 2,
-        });
-
-        const colorBuffer = createProgramAttributeBuffer(gl, program, {
-          name: "color",
-          size: 3,
-          type: gl.FLOAT,
-        });
-
-        setWebGLBackgroundColor(gl, [...WHITE, 1]);
-
-        drawCar(gl, positionBuffer, colorBuffer);
-        drawClown(gl, positionBuffer, colorBuffer);
-        drawFlower(gl, positionBuffer, colorBuffer);
-      }}
-    />
+  const vertexShader = compileShader(
+    gl,
+    gl.VERTEX_SHADER,
+    VERTEX_SHADER_SOURCE
   );
+
+  const fragmentShader = compileShader(
+    gl,
+    gl.FRAGMENT_SHADER,
+    FRAGMENT_SHADER_SOURCE
+  );
+
+  const program = createProgram(gl, vertexShader, fragmentShader);
+
+  gl.useProgram(program);
+
+  const positionBuffer = createProgramAttributeBuffer(gl, program, {
+    name: "position",
+    type: gl.FLOAT,
+    size: 2,
+  });
+
+  const colorBuffer = createProgramAttributeBuffer(gl, program, {
+    name: "color",
+    size: 3,
+    type: gl.FLOAT,
+  });
+
+  setWebGLBackgroundColor(gl, [...WHITE, 1]);
+
+  drawCar(gl, positionBuffer, colorBuffer);
+  drawClown(gl, positionBuffer, colorBuffer);
+  drawFlower(gl, positionBuffer, colorBuffer);
 };
