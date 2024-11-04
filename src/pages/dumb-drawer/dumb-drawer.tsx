@@ -4,17 +4,22 @@ import { useGL } from "../../hooks/use-gl";
 import { compileShader } from "../../webgl/core/shader";
 import { createProgram } from "../../webgl/core/program";
 import { createProgramAttributeBuffer } from "../../webgl/core/buffer";
-import { drawLineWithPoints, drawSimplePoint } from "../../webgl/common/point";
+import {
+  drawLineWithPoints,
+  drawSimplePoint,
+  drawTriangleWithPoints,
+} from "../../webgl/common/point";
 import { Vector2 } from "../../webgl/core/types";
 
 const VERTEX_SHADER_SOURCE = `
   attribute vec2 position;
 
   uniform mat4 matrix;
+  uniform float wd;
 
   void main() {
     gl_Position = matrix * vec4(position, 0, 1);
-    gl_PointSize = 4.0;
+    gl_PointSize = wd;
   }
   `;
 
@@ -50,7 +55,10 @@ const createMatrix = (size: number) => [
 export const DumbDrawer = () => {
   const size = Math.min(window.innerWidth - 245, window.innerHeight - 50);
 
+  const [mode, setMode] = React.useState<1 | 2>(1);
+  const [mode2, setMode2] = React.useState<1 | 2>(1);
   const [colorLoc, setColorLoc] = React.useState<WebGLUniformLocation>();
+  const [wdLoc, setWDLoc] = React.useState<WebGLUniformLocation>();
   const [points, setPoints] = React.useState<Vector2[]>([]);
   const [posBuf, setPosBuf] = React.useState<WebGLBuffer>();
 
@@ -79,14 +87,17 @@ export const DumbDrawer = () => {
 
     const matrixUniformLocation = gl.getUniformLocation(program, `matrix`);
     const colorUniformLocation = gl.getUniformLocation(program, `color`);
+    const wdUniformLocation = gl.getUniformLocation(program, `wd`);
 
     if (colorUniformLocation) setColorLoc(colorUniformLocation);
+    if (wdUniformLocation) setWDLoc(wdUniformLocation);
 
     const matrix = createMatrix(size);
 
     gl.uniformMatrix4fv(matrixUniformLocation, false, matrix);
 
     gl.uniform3fv(colorUniformLocation, [0, 0, 0]);
+    gl.uniform1f(wdUniformLocation, 4);
 
     const positionBuffer = createProgramAttributeBuffer(gl, program, {
       name: "position",
@@ -105,62 +116,100 @@ export const DumbDrawer = () => {
     );
   }, [gl, size]);
 
-  const changeColor = React.useCallback(
+  const changeSm = React.useCallback(
     (code: string) => {
       if (!colorLoc) return;
 
       switch (code) {
         case "0":
-          gl?.uniform3fv(colorLoc, [0.0, 0.0, 0.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [0.0, 0.0, 0.0])
+            : gl?.uniform1f(wdLoc, 0);
           break;
         case "1":
-          gl?.uniform3fv(colorLoc, [1.0, 0.0, 0.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [1.0, 0.0, 0.0])
+            : gl?.uniform1f(wdLoc, 1);
           break;
         case "2":
-          gl?.uniform3fv(colorLoc, [0.0, 1.0, 0.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [0.0, 1.0, 0.0])
+            : gl?.uniform1f(wdLoc, 2);
           break;
         case "3":
-          gl?.uniform3fv(colorLoc, [0.0, 0.0, 1.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [0.0, 0.0, 1.0])
+            : gl?.uniform1f(wdLoc, 3);
           break;
         case "4":
-          gl?.uniform3fv(colorLoc, [1.0, 1.0, 0.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [1.0, 1.0, 0.0])
+            : gl?.uniform1f(wdLoc, 4);
           break;
         case "5":
-          gl?.uniform3fv(colorLoc, [0.0, 1.0, 1.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [0.0, 1.0, 1.0])
+            : gl?.uniform1f(wdLoc, 5);
           break;
         case "6":
-          gl?.uniform3fv(colorLoc, [1.0, 0.0, 1.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [1.0, 0.0, 1.0])
+            : gl?.uniform1f(wdLoc, 6);
           break;
         case "7":
-          gl?.uniform3fv(colorLoc, [1.0, 0.5, 0.5]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [1.0, 0.5, 0.5])
+            : gl?.uniform1f(wdLoc, 7);
           break;
         case "8":
-          gl?.uniform3fv(colorLoc, [0.5, 1.0, 0.5]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [0.5, 1.0, 0.5])
+            : gl?.uniform1f(wdLoc, 8);
           break;
         case "9":
-          gl?.uniform3fv(colorLoc, [0.5, 0.5, 1.0]);
+          mode2 === 1
+            ? gl?.uniform3fv(colorLoc, [0.5, 0.5, 1.0])
+            : gl?.uniform1f(wdLoc, 9);
           break;
       }
       if (gl && posBuf && points.length === 2)
-        drawLineWithPoints(
-          gl,
-          posBuf,
-          undefined,
-          [points[0], points[1]],
-          undefined
-        );
+        if (mode === 1)
+          drawLineWithPoints(
+            gl,
+            posBuf,
+            undefined,
+            [points[0], points[1]],
+            undefined
+          );
+        else
+          drawTriangleWithPoints(
+            gl,
+            posBuf,
+            undefined,
+            [points[0], points[1], points[2]],
+            undefined
+          );
     },
-    [colorLoc, gl, points, posBuf]
+    [colorLoc, gl, mode, mode2, points, posBuf, wdLoc]
   );
 
   React.useEffect(() => {
-    const f = (e: { key: string }) => changeColor(e.key);
+    const f = (e: { key: string }) => {
+      if (e.key === "t" || e.key === "T") setMode(2);
+      else if (e.key === "r" || e.key === "R") setMode(1);
+
+      if (e.key === "e" || e.key === "E") setMode2(2);
+      else if (e.key === "k" || e.key === "K") setMode2(1);
+
+      changeSm(e.key);
+    };
 
     document.addEventListener("keydown", f);
+
     return () => {
       document.removeEventListener("keydown", f);
     };
-  }, [changeColor]);
+  }, [changeSm]);
 
   return (
     <BorderedCanvas
@@ -176,17 +225,26 @@ export const DumbDrawer = () => {
         const length = points.length;
 
         setPoints((previous) =>
-          length == 2 ? [[x, y]] : [...previous, [x, y]]
+          length == mode + 1 ? [[x, y]] : [...previous, [x, y]]
         );
 
-        if (gl && posBuf && length == 1)
-          drawLineWithPoints(
-            gl,
-            posBuf,
-            undefined,
-            [points[0], [x, y]],
-            undefined
-          );
+        if (gl && posBuf && length == mode)
+          if (mode === 1)
+            drawLineWithPoints(
+              gl,
+              posBuf,
+              undefined,
+              [points[0], [x, y]],
+              undefined
+            );
+          else
+            drawTriangleWithPoints(
+              gl,
+              posBuf,
+              undefined,
+              [points[0], points[1], [x, y]],
+              undefined
+            );
       }}
       width={size}
       height={size}
