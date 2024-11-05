@@ -9,7 +9,7 @@ import {
   drawSimplePoint,
   drawTriangleWithPoints,
 } from "../../webgl/common/point";
-import { Vector2 } from "../../webgl/core/types";
+import { Vector2, Vector3 } from "../../webgl/core/types";
 
 const VERTEX_SHADER_SOURCE = `
   attribute vec2 position;
@@ -57,7 +57,9 @@ export const DumbDrawer = () => {
 
   const [mode, setMode] = React.useState<1 | 2>(1);
   const [mode2, setMode2] = React.useState<1 | 2>(1);
-  const [colorLoc, setColorLoc] = React.useState<WebGLUniformLocation>();
+  const [colorLoc, setColorLoc] = React.useState<WebGLUniformLocation | null>(
+    null
+  );
   const [wdLoc, setWDLoc] = React.useState<WebGLUniformLocation | null>(null);
   const [points, setPoints] = React.useState<Vector2[]>([]);
   const [posBuf, setPosBuf] = React.useState<WebGLBuffer>();
@@ -65,6 +67,14 @@ export const DumbDrawer = () => {
   const ref = React.useRef<HTMLCanvasElement>(null);
 
   const gl = useGL(ref);
+
+  const updateUniform = React.useCallback(
+    (mode: number, color: Vector3, width: number) => {
+      if (mode === 1) gl?.uniform3fv(colorLoc, color);
+      else gl?.uniform1f(wdLoc, width);
+    },
+    [colorLoc, gl, wdLoc]
+  );
 
   React.useEffect(() => {
     if (!gl) return () => undefined;
@@ -122,57 +132,38 @@ export const DumbDrawer = () => {
 
       switch (code) {
         case "0":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [0.0, 0.0, 0.0])
-            : gl?.uniform1f(wdLoc, 0);
+          updateUniform(mode2, [0.0, 0.0, 0.0], 0);
           break;
         case "1":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [1.0, 0.0, 0.0])
-            : gl?.uniform1f(wdLoc, 1);
+          updateUniform(mode2, [1.0, 0.0, 0.0], 1);
           break;
         case "2":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [0.0, 1.0, 0.0])
-            : gl?.uniform1f(wdLoc, 2);
+          updateUniform(mode2, [0.0, 1.0, 0.0], 2);
           break;
         case "3":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [0.0, 0.0, 1.0])
-            : gl?.uniform1f(wdLoc, 3);
+          updateUniform(mode2, [0.0, 0.0, 1.0], 3);
           break;
         case "4":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [1.0, 1.0, 0.0])
-            : gl?.uniform1f(wdLoc, 4);
+          updateUniform(mode2, [1.0, 1.0, 0.0], 4);
           break;
         case "5":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [0.0, 1.0, 1.0])
-            : gl?.uniform1f(wdLoc, 5);
+          updateUniform(mode2, [0.0, 1.0, 1.0], 5);
           break;
         case "6":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [1.0, 0.0, 1.0])
-            : gl?.uniform1f(wdLoc, 6);
+          updateUniform(mode2, [1.0, 0.0, 1.0], 6);
           break;
         case "7":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [1.0, 0.5, 0.5])
-            : gl?.uniform1f(wdLoc, 7);
+          updateUniform(mode2, [1.0, 0.5, 0.5], 7);
           break;
         case "8":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [0.5, 1.0, 0.5])
-            : gl?.uniform1f(wdLoc, 8);
+          updateUniform(mode2, [0.5, 1.0, 0.5], 8);
           break;
         case "9":
-          mode2 === 1
-            ? gl?.uniform3fv(colorLoc, [0.5, 0.5, 1.0])
-            : gl?.uniform1f(wdLoc, 9);
+          updateUniform(mode2, [0.5, 0.5, 1.0], 9);
           break;
       }
-      if (gl && posBuf && points.length === 2)
+
+      if (gl && posBuf && points.length === mode + 1)
         if (mode === 1)
           drawLineWithPoints(
             gl,
@@ -190,7 +181,7 @@ export const DumbDrawer = () => {
             undefined
           );
     },
-    [colorLoc, gl, mode, mode2, points, posBuf, wdLoc]
+    [colorLoc, gl, mode, mode2, points, posBuf, updateUniform]
   );
 
   React.useEffect(() => {
