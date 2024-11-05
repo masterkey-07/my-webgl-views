@@ -58,7 +58,7 @@ export const DumbDrawer = () => {
   const [mode, setMode] = React.useState<1 | 2>(1);
   const [mode2, setMode2] = React.useState<1 | 2>(1);
   const [colorLoc, setColorLoc] = React.useState<WebGLUniformLocation>();
-  const [wdLoc, setWDLoc] = React.useState<WebGLUniformLocation>();
+  const [wdLoc, setWDLoc] = React.useState<WebGLUniformLocation | null>(null);
   const [points, setPoints] = React.useState<Vector2[]>([]);
   const [posBuf, setPosBuf] = React.useState<WebGLBuffer>();
 
