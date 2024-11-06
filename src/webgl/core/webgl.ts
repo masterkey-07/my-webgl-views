@@ -2,6 +2,10 @@ import { Vector4 } from "./types";
 
 export type GL = WebGLRenderingContext;
 
+export type Buffer = WebGLBuffer;
+
+export type UniformLocation = WebGLUniformLocation;
+
 export const conf = { size: 0 };
 
 type Conf = typeof conf;
@@ -34,6 +38,7 @@ export const setWebGLBackgroundColor = (gl: GL, color: Vector4) => {
 export const toPos = (value: number) =>
   conf.size ? value / (conf.size / 2) - 1 : value;
 
-export const toColor = (value: number) => value / 255;
+export const fromPos = (value: number) =>
+  conf.size ? (value + 1) * (conf.size / 2) : value;
 
-// a = 2x / (x + 1)
+export const toColor = (value: number) => value / 255;

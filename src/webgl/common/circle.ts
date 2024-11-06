@@ -1,6 +1,6 @@
 import { GL } from "../core/webgl";
 import { drawFloatArrayBuffers } from "../core/buffer";
-import { fillColor, randomColor } from "../core/color";
+import { fillColor } from "../core/color";
 import { isVector3, Vector2, Vector3 } from "../core/types";
 
 const TWO_PI = 2 * Math.PI;
@@ -41,9 +41,9 @@ export const getCircleVertices = (
 export const drawSimpleCircle = (
   gl: GL,
   positionBuffer: WebGLBuffer,
-  colorBuffer: WebGLBuffer,
+  colorBuffer: WebGLBuffer | undefined,
   circle: Circle,
-  color: Vector3 | Float32Array = randomColor()
+  color?: Vector3 | Float32Array
 ) => {
   const vertices = getCircleVertices(
     circle.triangles,
@@ -51,9 +51,11 @@ export const drawSimpleCircle = (
     circle.center
   );
 
-  const colors = isVector3(color)
-    ? fillColor(circle.triangles * 9, color)
-    : color;
+  const colors = color
+    ? isVector3(color)
+      ? fillColor(circle.triangles * 9, color)
+      : color
+    : undefined;
 
   drawFloatArrayBuffers(
     gl,

@@ -27,13 +27,17 @@ export const getRectangleVertices = (rectangle: Rectangle) => {
 export const drawSimpleRectangle = (
   gl: GL,
   positionBuffer: WebGLBuffer,
-  colorBuffer: WebGLBuffer,
+  colorBuffer: WebGLBuffer | undefined,
   rectangle: Rectangle,
-  colors: Float32Array | Vector3
+  colors: Float32Array | Vector3 | undefined
 ) => {
   const vertices = getRectangleVertices(rectangle);
 
-  const rectangleColors = isVector3(colors) ? fillColor(18, colors) : colors;
+  const rectangleColors = colors
+    ? isVector3(colors)
+      ? fillColor(18, colors)
+      : colors
+    : undefined;
 
   drawFloatArrayBuffers(
     gl,
