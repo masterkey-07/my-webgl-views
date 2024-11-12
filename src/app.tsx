@@ -5,7 +5,7 @@ import routers from "./routers";
 // Styles for the layout
 const navbarStyle: CSSProperties = {
   height: "100vh",
-  width: "200px",
+  width: "350px",
   position: "fixed",
   paddingTop: "20px",
   backgroundColor: "#777",
@@ -30,7 +30,7 @@ const listItemStyle: CSSProperties = {
 };
 
 const contentStyle: CSSProperties = {
-  marginLeft: "200px",
+  marginLeft: "350px",
   padding: "20px",
   width: "100%",
 };
