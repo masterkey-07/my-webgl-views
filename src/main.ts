@@ -10,5 +10,14 @@ const functions: FunctionRecord = { drawTaskOne };
 button.addEventListener("click", () => {
   const fn = functions[select.value];
 
-  if (fn) fn();
+  if (fn) {
+    window.history.pushState({}, "", select.value);
+    fn();
+  }
 });
+
+const path = window.location.pathname.split("/").pop();
+
+if (path && functions[path]) {
+  functions[path]();
+}
