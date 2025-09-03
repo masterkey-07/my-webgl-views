@@ -2,12 +2,19 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Web GL Views</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <title>Unifesp - Aula de Computação Gráfica</title>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <div class="controls">
+      <label for="views-select">Selecionar Tarefa:</label>
+      <select id="views-select">
+        <option value="drawTaskOne">Tarefa 1</option>
+      </select>
+      <button id="launch-btn">Carregar</button>
+    </div>
+    <canvas id="webgl" width="800" height="600"></canvas>
+    <script type="module" src="src/main.ts"></script>
   </body>
 </html>
