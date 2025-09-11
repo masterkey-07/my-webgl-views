@@ -1,3 +1,5 @@
+import type { RGB } from "./color";
+
 export const compileShader = (webgl: WebGLRenderingContext, shaderType: GLenum, shaderSource: string) => {
   const shader = webgl.createShader(shaderType);
 
@@ -56,7 +58,7 @@ export const createProgram = (webgl: WebGLRenderingContext, vertexShader: WebGLS
   return program;
 };
 
-export const cleanupBackground = (gl: WebGLRenderingContext) => {
-  gl.clearColor(0, 0, 0, 1);
+export const setBackgroundColor = (gl: WebGLRenderingContext, color: RGB) => {
+  gl.clearColor(...color, 1);
   gl.clear(gl.COLOR_BUFFER_BIT);
 };

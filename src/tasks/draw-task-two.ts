@@ -41,5 +41,5 @@ export default () => {
 
   const colorBuffer = createBuffer(gl, program, "color", 3);
 
-  draw2DTriangule(gl, positionBuffer, colorBuffer, get2DTriangleVertices([0, 0.5, -0.5, -0.5, 0.5, -0.5]), generate2DTriangleColors());
+  draw2DTriangule(gl, positionBuffer, colorBuffer, get2DTriangleVertices([0, -0.5, -0.5, 0.5, 0.5, 0.5]), generate2DTriangleColors());
 };
