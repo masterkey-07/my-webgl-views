@@ -83,9 +83,12 @@ export default () => {
   };
 
   const drawPoints = () => {
+    setBackgroundColor(gl, [1, 1, 1]);
     if (state.drawMode === 2) draw2DLineWithPoints(gl, positionBuffer, undefined, points as [Point2D, Point2D], undefined);
     else if (state.drawMode === 3) drawTriangleWithPoints(gl, positionBuffer, undefined, points as [Point2D, Point2D, Point2D], undefined);
   };
+
+  cleanup();
 
   document.addEventListener("keydown", (event) => {
     if (event.key === "t" || event.key === "T") {
@@ -94,11 +97,9 @@ export default () => {
     } else if (event.key === "r" || event.key === "R") {
       state.drawMode = 2;
       cleanup();
-    }
-    if (event.key === "e" || event.key === "E") state.changeMode = "color";
+    } else if (event.key === "e" || event.key === "E") state.changeMode = "color";
     else if (event.key === "k" || event.key === "K") state.changeMode = "width";
-
-    if (event.key.match(/\d/)) {
+    else if (event.key.match(/\d/)) {
       if (state.changeMode === "color") gl.uniform3fv(colorUniformLocation, COLORS[Number(event.key)]);
       else gl.uniform1f(widthUniformLocation, Number(event.key) + 1);
 
