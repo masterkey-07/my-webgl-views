@@ -88,9 +88,7 @@ export default () => {
     else if (state.drawMode === 3) drawTriangleWithPoints(gl, positionBuffer, undefined, points as [Point2D, Point2D, Point2D], undefined);
   };
 
-  cleanup();
-
-  document.addEventListener("keydown", (event) => {
+  const onKeyDown = (event: KeyboardEvent) => {
     if (event.key === "t" || event.key === "T") {
       state.drawMode = 3;
       cleanup();
@@ -105,9 +103,9 @@ export default () => {
 
       drawPoints();
     }
-  });
+  };
 
-  canvas.addEventListener("mousedown", (event) => {
+  const onMouseDown = (event: MouseEvent) => {
     const rect = canvas.getBoundingClientRect();
 
     const x = event.clientX - rect.x;
@@ -124,5 +122,15 @@ export default () => {
     const draw = state.drawMode === length;
 
     if (draw) drawPoints();
-  });
+  };
+
+  cleanup();
+
+  document.addEventListener("keydown", onKeyDown);
+  canvas.addEventListener("mousedown", onMouseDown);
+
+  return () => {
+    document.removeEventListener("keydown", onKeyDown);
+    canvas.removeEventListener("mousedown", onMouseDown);
+  };
 };
