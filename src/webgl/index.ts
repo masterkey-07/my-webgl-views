@@ -22,10 +22,15 @@ export const compileShader = (webgl: WebGLRenderingContext, shaderType: GLenum, 
   return shader;
 };
 
-export const getWebGL = () => {
+export const getCanvas = () => {
   const canvas = document.getElementsByTagName("canvas")?.[0];
 
   if (!canvas) throw new Error("Canvas not found");
+  return canvas;
+};
+
+export const getWebGL = () => {
+  const canvas = getCanvas();
 
   const gl = canvas.getContext("webgl");
 

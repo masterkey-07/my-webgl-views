@@ -1,34 +1,62 @@
-import { setBackgroundColor, compileShader, createProgram, getWebGL } from "../webgl";
+import { setBackgroundColor, compileShader, createProgram, getWebGL, getCanvas } from "../webgl";
 import { createBuffer } from "../webgl/buffer";
-import { draw2DTriangule, generate2DTriangleColors, get2DTriangleVertices } from "../webgl/triangle";
+import type { Matrix4 } from "../webgl/matrix";
+import { draw2DLineWithPoints, draw2DPoint, drawTriangleWithPoints } from "../webgl/point";
+import type { Point2D, Vector3 } from "../webgl/vector";
 
 const VERTEX_SHADER_SOURCE = `
   attribute vec2 position;
-  attribute vec3 color;
-  varying vec3 vColor;
-    
+
+  uniform mat4 matrix;
+  uniform float wd;
+
   void main() {
-      gl_Position = vec4(position,0.0,1.0);
-      vColor = color;
+    gl_Position = matrix * vec4(position, 0, 1);
+    gl_PointSize = wd;
   }
-`;
+  `;
 
 const FRAGMENT_SHADER_SOURCE = `
   precision mediump float;
 
-  varying vec3 vColor;        
+  uniform vec3 color;
 
   void main() {
-      gl_FragColor = vec4(vColor,1.0);
+    gl_FragColor = vec4(color,1.0);
   }
 `;
+
+type State = {
+  drawMode: 2 | 3;
+  changeMode: "color" | "width";
+};
+
+const COLORS: Vector3[] = [
+  [0.0, 0.0, 0.0],
+  [1.0, 0.0, 0.0],
+  [0.0, 1.0, 0.0],
+  [0.0, 0.0, 1.0],
+  [1.0, 1.0, 0.0],
+  [0.0, 1.0, 1.0],
+  [1.0, 0.0, 1.0],
+  [1.0, 0.5, 0.5],
+  [0.5, 1.0, 0.5],
+  [0.5, 0.5, 1.0],
+];
+
+const state: State = { drawMode: 3, changeMode: "color" };
+const points: Point2D[] = [];
+
+const createMatrix = (width: number): Matrix4 => [2 / width, 0, 0, 0, 0, -2 / width, 0, 0, 0, 0, 0, 0, -1, 1, 0, 1];
 
 export default () => {
   console.log("loading task one");
 
-  const gl = getWebGL();
+  const matrix = createMatrix(800);
 
-  setBackgroundColor(gl, [1, 1, 1]);
+  const canvas = getCanvas();
+
+  const gl = getWebGL();
 
   const vertexShader = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SOURCE);
   const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
@@ -37,9 +65,63 @@ export default () => {
 
   gl.useProgram(program);
 
+  const matrixUniformLocation = gl.getUniformLocation(program, `matrix`);
+  const colorUniformLocation = gl.getUniformLocation(program, `color`);
+  const widthUniformLocation = gl.getUniformLocation(program, `wd`);
+
+  gl.uniformMatrix4fv(matrixUniformLocation, false, matrix);
+
+  gl.uniform3fv(colorUniformLocation, [1, 0, 0]);
+  gl.uniform1f(widthUniformLocation, 4);
+
   const positionBuffer = createBuffer(gl, program, "position", 2);
 
-  const colorBuffer = createBuffer(gl, program, "color", 3);
+  const cleanup = () => {
+    while (points.pop());
+    setBackgroundColor(gl, [1, 1, 1]);
+    draw2DPoint(gl, positionBuffer, undefined, new Float32Array([800 / 2, 800 / 2]));
+  };
 
-  draw2DTriangule(gl, positionBuffer, colorBuffer, get2DTriangleVertices([0, 0.5, -0.5, -0.5, 0.5, -0.5]), generate2DTriangleColors());
+  const drawPoints = () => {
+    if (state.drawMode === 2) draw2DLineWithPoints(gl, positionBuffer, undefined, points as [Point2D, Point2D], undefined);
+    else if (state.drawMode === 3) drawTriangleWithPoints(gl, positionBuffer, undefined, points as [Point2D, Point2D, Point2D], undefined);
+  };
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "t" || event.key === "T") {
+      state.drawMode = 3;
+      cleanup();
+    } else if (event.key === "r" || event.key === "R") {
+      state.drawMode = 2;
+      cleanup();
+    }
+    if (event.key === "e" || event.key === "E") state.changeMode = "color";
+    else if (event.key === "k" || event.key === "K") state.changeMode = "width";
+
+    if (event.key.match(/\d/)) {
+      if (state.changeMode === "color") gl.uniform3fv(colorUniformLocation, COLORS[Number(event.key)]);
+      else gl.uniform1f(widthUniformLocation, Number(event.key) + 1);
+
+      drawPoints();
+    }
+  });
+
+  canvas.addEventListener("mousedown", (event) => {
+    const rect = canvas.getBoundingClientRect();
+
+    const x = event.clientX - rect.x;
+    const y = event.clientY - rect.y;
+
+    const pastLength = points.length;
+
+    if (state.drawMode === pastLength) while (points.length) points.pop();
+
+    points.push([x, y]);
+
+    const length = points.length;
+
+    const draw = state.drawMode === length;
+
+    if (draw) drawPoints();
+  });
 };

@@ -4,11 +4,7 @@ import { useGL } from "../../hooks/use-gl";
 import { compileShader } from "../../webgl/core/shader";
 import { createProgram } from "../../webgl/core/program";
 import { createProgramAttributeBuffer } from "../../webgl/core/buffer";
-import {
-  drawLineWithPoints,
-  drawSimplePoint,
-  drawTriangleWithPoints,
-} from "../../webgl/common/point";
+import { drawLineWithPoints, drawSimplePoint, drawTriangleWithPoints } from "../../webgl/common/point";
 import { Vector2, Vector3 } from "../../webgl/core/types";
 
 const VERTEX_SHADER_SOURCE = `
@@ -33,33 +29,14 @@ const FRAGMENT_SHADER_SOURCE = `
   }
 `;
 
-const createMatrix = (size: number) => [
-  2 / size,
-  0,
-  0,
-  0,
-  0,
-  -2 / size,
-  0,
-  0,
-  0,
-  0,
-  0,
-  0,
-  -1,
-  1,
-  0,
-  1,
-];
+const createMatrix = (size: number) => [2 / size, 0, 0, 0, 0, -2 / size, 0, 0, 0, 0, 0, 0, -1, 1, 0, 1];
 
 export const DumbDrawer = () => {
   const size = Math.min(window.innerWidth - 245, window.innerHeight - 50);
 
   const [mode, setMode] = React.useState<1 | 2>(1);
   const [mode2, setMode2] = React.useState<1 | 2>(1);
-  const [colorLoc, setColorLoc] = React.useState<WebGLUniformLocation | null>(
-    null
-  );
+  const [colorLoc, setColorLoc] = React.useState<WebGLUniformLocation | null>(null);
   const [wdLoc, setWDLoc] = React.useState<WebGLUniformLocation | null>(null);
   const [points, setPoints] = React.useState<Vector2[]>([]);
   const [posBuf, setPosBuf] = React.useState<WebGLBuffer>();
@@ -79,17 +56,9 @@ export const DumbDrawer = () => {
   React.useEffect(() => {
     if (!gl) return () => undefined;
 
-    const vertexShader = compileShader(
-      gl,
-      gl.VERTEX_SHADER,
-      VERTEX_SHADER_SOURCE
-    );
+    const vertexShader = compileShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SOURCE);
 
-    const fragmentShader = compileShader(
-      gl,
-      gl.FRAGMENT_SHADER,
-      FRAGMENT_SHADER_SOURCE
-    );
+    const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
 
     const program = createProgram(gl, vertexShader, fragmentShader);
 
@@ -117,13 +86,7 @@ export const DumbDrawer = () => {
 
     setPosBuf(positionBuffer);
 
-    drawSimplePoint(
-      gl,
-      positionBuffer,
-      undefined,
-      [size / 2, size / 2],
-      undefined
-    );
+    drawSimplePoint(gl, positionBuffer, undefined, [size / 2, size / 2], undefined);
   }, [gl, size]);
 
   const changeSm = React.useCallback(
@@ -164,22 +127,8 @@ export const DumbDrawer = () => {
       }
 
       if (gl && posBuf && points.length === mode + 1)
-        if (mode === 1)
-          drawLineWithPoints(
-            gl,
-            posBuf,
-            undefined,
-            [points[0], points[1]],
-            undefined
-          );
-        else
-          drawTriangleWithPoints(
-            gl,
-            posBuf,
-            undefined,
-            [points[0], points[1], points[2]],
-            undefined
-          );
+        if (mode === 1) drawLineWithPoints(gl, posBuf, undefined, [points[0], points[1]], undefined);
+        else drawTriangleWithPoints(gl, posBuf, undefined, [points[0], points[1], points[2]], undefined);
     },
     [colorLoc, gl, mode, mode2, points, posBuf, updateUniform]
   );
@@ -215,27 +164,11 @@ export const DumbDrawer = () => {
 
         const length = points.length;
 
-        setPoints((previous) =>
-          length == mode + 1 ? [[x, y]] : [...previous, [x, y]]
-        );
+        setPoints((previous) => (length == mode + 1 ? [[x, y]] : [...previous, [x, y]]));
 
         if (gl && posBuf && length == mode)
-          if (mode === 1)
-            drawLineWithPoints(
-              gl,
-              posBuf,
-              undefined,
-              [points[0], [x, y]],
-              undefined
-            );
-          else
-            drawTriangleWithPoints(
-              gl,
-              posBuf,
-              undefined,
-              [points[0], points[1], [x, y]],
-              undefined
-            );
+          if (mode === 1) drawLineWithPoints(gl, posBuf, undefined, [points[0], [x, y]], undefined);
+          else drawTriangleWithPoints(gl, posBuf, undefined, [points[0], points[1], [x, y]], undefined);
       }}
       width={size}
       height={size}
