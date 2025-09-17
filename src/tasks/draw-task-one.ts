@@ -44,7 +44,7 @@ const COLORS: Vector3[] = [
   [0.5, 0.5, 1.0],
 ];
 
-const state: State = { drawMode: 3, changeMode: "color" };
+const state: State = { drawMode: 2, changeMode: "color" };
 const points: Point2D[] = [];
 
 const createMatrix = (width: number): Matrix4 => [2 / width, 0, 0, 0, 0, -2 / width, 0, 0, 0, 0, 0, 0, -1, 1, 0, 1];
