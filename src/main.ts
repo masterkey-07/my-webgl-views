@@ -26,4 +26,5 @@ const path = window.location.pathname.split("/").pop();
 
 if (path && functions[path]) {
   functions[path]();
+  select.value = path;
 }
